@@ -11,7 +11,7 @@ add_definitions(-DIF_OFFICIAL=0)
 ### Cmake flags
 ######################
 set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++14")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g -pthread")
 
 ######################
@@ -41,7 +41,7 @@ find_package(OpenCV REQUIRED)
 find_package(Ceres REQUIRED)
 find_package(GTSAM REQUIRED QUIET)
 find_package(Boost REQUIRED COMPONENTS filesystem program_options system timer)
-
+find_package(Boost REQUIRED COMPONENTS timer thread serialization chrono)
 
 ######################
 ### Message generation

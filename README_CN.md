@@ -28,7 +28,8 @@
 
 ---
 
-
+- Ubuntu20.04 + OpenCV4.0.* + ROS noetic + gtsam4.0 + Ceres1.14.0
+https://blog.csdn.net/qq_37868055/article/details/129288903
 
 ## 依赖库
 

@@ -15,7 +15,6 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
-#include <opencv/cv.h>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -55,7 +54,7 @@
 #include <thread>
 #include <mutex>
 #include <unordered_map>
-
+#include <opencv2/opencv.hpp>
 using namespace std;
 
 typedef pcl::PointXYZI PointType;

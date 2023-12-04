@@ -2,7 +2,6 @@
 
 #include <ros/ros.h>
 #include <ros/package.h>
-#include <opencv2/highgui/highgui.hpp>
 
 #include <std_msgs/Header.h>
 #include <std_msgs/Bool.h>
@@ -13,8 +12,6 @@
 #include <sensor_msgs/image_encodings.h>
 #include <nav_msgs/Odometry.h>
 
-#include <opencv/cv.h>
-#include <cv_bridge/cv_bridge.h>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -52,7 +49,9 @@
 #include <thread>
 #include <mutex>
 #include <cassert>
-
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
 using namespace std;
 
 typedef pcl::PointXYZI PointType;
