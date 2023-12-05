@@ -45,6 +45,7 @@ roslaunch lvi_sam Husky.launch
 ### 评估
 ```shell
 # pcd转txt，位于~/lvi-sam/src/LVI-SAM-Easyused/pcd2tum.py
+# pip install pyntcloud
 python pcd2tum.py
 ```
 - 安装evo评估工具
