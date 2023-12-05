@@ -77,8 +77,27 @@ with open(kiss_file, 'r') as f:
         kiss_poses.append(pose)
         kiss_trans.append(t)
 
+# Do further processing with the point cloud data
+# ...
+fastlio_poses = []
+fastlio_trans = []
+fastlio_file = os.path.join(current_file_path,'fastlio2.txt')
+with open(fastlio_file, 'r') as f:
+    lines = f.readlines()
+    for line in lines:
+        data = line.split()
+        time = float(data[0])
+        t = np.array([float(data[1]), float(data[2]), float(data[3])])
+        R = Rotation.from_quat([float(data[4]), float(data[5]), float(data[6]), float(data[7])]).as_matrix()
+        T = np.eye(4)
+        T[:3,:3] = R
+        T[:3,3] = t
+        pose = [time, T]
+        fastlio_poses.append(pose)
+        fastlio_trans.append(t)
 
 # compute rotational and translational errors, end-to-end pose error
+print("LVI-SAM:")
 first_frame = poses[0]
 last_frame = poses[-1]
 closest_first_frame = min(gt_poses, key=lambda pose: abs(pose[0] - first_frame[0]))
@@ -93,15 +112,16 @@ pose_error = np.dot(np.linalg.inv(pose_delta_result), pose_delta_gt)
 
 r_err = rotationError(pose_error) #deg
 t_err = translationError(pose_error) #m
-print('*'*20)
 print('Rotation Error (deg): ', r_err)
 print('Translation Error (m): ', t_err)
+print('*'*20)
 
 # compute rotational and translational errors, end-to-end pose error
+print('KISS-ICP:')
 first_frame = kiss_poses[0]
 last_frame = kiss_poses[-1]
-closest_first_frame = gt_poses[0]
-closest_last_frame = gt_poses[-1]
+closest_first_frame = min(gt_poses, key=lambda pose: abs(pose[0] - first_frame[0]))
+closest_last_frame = min(gt_poses, key=lambda pose: abs(pose[0] - last_frame[0]))
 print('First frame time (s): ', first_frame[0])
 print('Closest first frame time (s): ', closest_first_frame[0])
 print('Last frame time (s): ', last_frame[0])
@@ -112,10 +132,29 @@ pose_error = np.dot(np.linalg.inv(pose_delta_result), pose_delta_gt)
 
 r_err = rotationError(pose_error) #deg
 t_err = translationError(pose_error) #m
-print('*'*20)
 print('Rotation Error (deg): ', r_err)
 print('Translation Error (m): ', t_err)
+print('*'*20)
 
+# compute rotational and translational errors, end-to-end pose error
+print("Fastlio2:")
+first_frame = fastlio_poses[0]
+last_frame = fastlio_poses[-1]
+closest_first_frame = min(gt_poses, key=lambda pose: abs(pose[0] - first_frame[0]))
+closest_last_frame = min(gt_poses, key=lambda pose: abs(pose[0] - last_frame[0]))
+print('First frame time (s): ', first_frame[0])
+print('Closest first frame time (s): ', closest_first_frame[0])
+print('Last frame time (s): ', last_frame[0])
+print('Closest last frame time (s): ', closest_last_frame[0])
+pose_delta_gt = np.dot(np.linalg.inv(closest_first_frame[1]), closest_last_frame[1])
+pose_delta_result = np.dot(np.linalg.inv(first_frame[1]), last_frame[1])
+pose_error = np.dot(np.linalg.inv(pose_delta_result), pose_delta_gt)
+
+r_err = rotationError(pose_error) #deg
+t_err = translationError(pose_error) #m
+print('Rotation Error (deg): ', r_err)
+print('Translation Error (m): ', t_err)
+print('*'*20)
 
 # Plot the trajectory
 fig = plt.figure()
@@ -124,6 +163,7 @@ fig = plt.figure()
 trans = np.array(trans)
 gt_trans = np.array(gt_trans)
 kiss_trans = np.array(kiss_trans)
+fastlio_trans = np.array(fastlio_trans)
 plt.plot(gt_trans[:,0], gt_trans[:,1], label='Ground Truth')
 
 # Plot estimated trajectory
@@ -132,8 +172,11 @@ plt.plot(trans[:,0], trans[:,1], label='LVI-SAM')
 # Plot estimated trajectory
 plt.plot(kiss_trans[:,0], kiss_trans[:,1], label='KISS-ICP')
 
+# Plot estimated trajectory
+plt.plot(fastlio_trans[:,0], fastlio_trans[:,1], label='FASTLIO2')
+
 # Set the title
-plt.title('Trajectory')
+plt.title('Trajectory-xy')
 plt.legend()
 
 # Show the plot

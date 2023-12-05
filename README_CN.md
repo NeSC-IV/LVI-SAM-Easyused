@@ -10,61 +10,65 @@
 
 ---
 
+## 依赖库
+
+这个仓库的依赖库与官方 [LVI-SAM](https://github.com/TixiaoShan/LVI-SAM) 相同。所以如果编译出现问题，建议先编译官方的 [LVI-SAM](https://github.com/TixiaoShan/LVI-SAM)。目前我们只在 Ubuntu 20.04 + ROS-noetic 环境中进行了测试。
+
+- Ubuntu20.04 + OpenCV4.0.* + ROS noetic + gtsam4.0.* + Ceres1.14.*
+参考： https://blog.csdn.net/qq_37868055/article/details/129288903
+---
 
 
-### 更新
+### 编译
 
 - **"new"分支**可用了，我们**建议您使用"new"分支**。因为原始 LVI-SAM 代码中的 LIO 系统使用了旧版本的 [LIO-SAM](https://github.com/TixiaoShan/LIO-SAM)，其中存在一些 bug，这些 bug 已在最新的 LIO-SAM 代码中修复。目前，我们已经将最新版本的 LIO-SAM 更新到 LVI-SAM 中，因此系统更加鲁棒。您可以使用以下命令下载并编译 **"new"分支**。
+- **"new"分支**已合并到默认分支
 
   ```shell
-  mkdir -p ~/catkin_ws/src 
-  cd ~/catkin_ws/src
-  git clone https://github.com/Cc19245/LVI-SAM-Easyused
-  git checkout new
+  mkdir -p ~/lvi-sam/src 
+  cd ~/lvi-sam/src
+  git clone https://github.com/NeSC-IV/LVI-SAM-Easyused.git
   cd ..
   catkin_make
   ```
-
-
 ---
 
-- Ubuntu20.04 + OpenCV4.0.* + ROS noetic + gtsam4.0 + Ceres1.14.0
-https://blog.csdn.net/qq_37868055/article/details/129288903
-
-## 依赖库
-
-这个仓库的依赖库与官方 [LVI-SAM](https://github.com/TixiaoShan/LVI-SAM) 相同。所以如果编译出现问题，建议先编译官方的 [LVI-SAM](https://github.com/TixiaoShan/LVI-SAM)。目前我们只在 Ubuntu 18.04 + ROS-melodic 环境中进行了测试。
-
----
-
-
-
-## 编译
-
-你可以使用如下命令下载并编译这个功能包。
-
+### 运行
 ```shell
-mkdir -p ~/catkin_ws/src
-cd ~/catkin_ws/src
-git clone https://github.com/Cc19245/LVI-SAM-Easyused
-cd ..
-catkin_make
+source devel/setup.bash
+roslaunch lvi_sam Husky.launch
 ```
-
-**注意**：如果想使用未修改的代码（LVI-SAM官方代码），可以修改 `CMakeLists.txt` 中的定义，重新编译。
-
-```cmake
-################## 编译开关 compile switch##############
-# -DIF_OFFICIAL=1: use origin official LVI-SAM code
-# -DIF_OFFICIAL=0: use modified code of this repo
-add_definitions(-DIF_OFFICIAL=0)
-```
+- 运行后，在 ```~/lvi-sam/results/```下会自动保存地图文件和轨迹文件。
 
 ---
 
+### 评估
+```shell
+# pcd转txt，位于~/lvi-sam/src/LVI-SAM-Easyused/pcd2tum.py
+python pcd2tum.py
+```
+- 安装evo评估工具
+```shell
+# https://github.com/MichaelGrupp/evo
+pip install evo --upgrade --no-binary evo
+```
+- 拷贝真值轨迹
+```shell
+cp ~/lvi-sam/src/LVI-SAM-Easyused/results/gt.txt ~/lvi-sam/results/gt.txt
+```
+- 计算误差
+```shell
+# -r full (旋转+平移) trans_part (平移m) angle_deg (旋转deg)
+evo_ape tum gt.txt lvisam.txt -r full -va --plot --plot_mode xy --save_plot ./lvisamplot
+# 多轨迹绘制
+# evo_traj tum lvisam.txt fastlio2.txt kissicp.txt --ref=gt.txt -va -p --plot_mode=xy --save_plot ./trajall
+```
 
+---
 
 ## 参数配置
+
+- 相机内参，相机-IMU，LiDAR-IMU外参已配置到Husky_camera.yaml，Husky_lidar.yaml中
 
 ### 传感器外参配置
 

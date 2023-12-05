@@ -4,8 +4,8 @@ PROJECT_NAME: "lvi_sam"
 lvi_sam:
 
   # Topics
-  pointCloudTopic: "/points_raw"               # Point cloud data
-  imuTopic: "/imu_raw"                         # IMU data
+  pointCloudTopic: "/velodyne_points"               # Point cloud data
+  imuTopic: "/imu/data"                         # IMU data
   odomTopic: "odometry/imu"                   # IMU pre-preintegration odometry, same frequency as IMU
   gpsTopic: "odometry/gpsz"                   # GPS odometry topic from navsat, see module_navsat.launch file
   
@@ -27,12 +27,12 @@ lvi_sam:
 
   # Sensor Settings
   sensor: velodyne                            # lidar sensor type, 'velodyne' or 'ouster' or 'livox'
-  N_SCAN: 64                                  # number of lidar channel (i.e., Velodyne/Ouster: 16, 32, 64, 128, Livox Horizon: 6)
+  N_SCAN: 16                                  # number of lidar channel (i.e., Velodyne/Ouster: 16, 32, 64, 128, Livox Horizon: 6)
   Horizon_SCAN: 1800                          # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048, Livox Horizon: 4000)
   timeField: "time"                           # point timestamp field, Velodyne - "time", Ouster - "t"
-  downsampleRate: 2                           # default: 1. Downsample your data if too many points. i.e., 16 = 64 / 4, 16 = 16 / 1
+  downsampleRate: 1                           # default: 1. Downsample your data if too many points. i.e., 16 = 64 / 4, 16 = 16 / 1
   lidarMinRange: 1.0                          # default: 1.0, minimum lidar range to be used
-  lidarMaxRange: 1000.0                        # default: 1000.0, maximum lidar range to be used
+  lidarMaxRange: 100.0                        # default: 1000.0, maximum lidar range to be used
 
   # IMU Settings
   imuAccNoise: 3.9939570888238808e-03
@@ -43,10 +43,10 @@ lvi_sam:
   
   ###################### extrinsic between IMU and LiDAR  ###########################
   ###################### T_IMU_LiDAR, LiDAR -> IMU       ###########################
-  extrinsicTranslation: [8.10543972e-01, -3.07054372e-01, 8.02723995e-01]
-  extrinsicRotation: [9.999976e-01, -7.854027e-04, 2.024406e-03,
-                      7.553071e-04,  9.998898e-01, 1.482454e-02,
-                     -2.035826e-03, -1.482298e-02, 9.998881e-01]
+  extrinsicTranslation: [0, 0, 0.06]
+  extrinsicRotation: [1, 0, 0,
+                      0,  1, 0,
+                     0, 0, 1]
 
   ########################## IMU property config  ###########################
   ## 对绝大多数IMU来说，下面三个值分别是"+z", "+y", "+x" (for most of IMUs, the following config is "+z", "+y", "+x")
