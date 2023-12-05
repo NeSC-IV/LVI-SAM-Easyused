@@ -53,9 +53,9 @@ python pcd2tum.py
 # https://github.com/MichaelGrupp/evo
 pip install evo --upgrade --no-binary evo
 ```
-- 拷贝真值轨迹
+- 拷贝真值轨迹, gt.txt
 ```shell
-cp ~/lvi-sam/src/LVI-SAM-Easyused/results/gt.txt ~/lvi-sam/results/gt.txt
+~/lvi-sam/results/gt.txt
 ```
 - 计算误差
 ```shell
