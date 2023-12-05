@@ -10,60 +10,66 @@
 
 ---
 
+## 依赖库
+
+这个仓库的依赖库与官方 [LVI-SAM](https://github.com/TixiaoShan/LVI-SAM) 相同。所以如果编译出现问题，建议先编译官方的 [LVI-SAM](https://github.com/TixiaoShan/LVI-SAM)。目前我们只在 Ubuntu 20.04 + ROS-noetic 环境中进行了测试。
+
+- Ubuntu20.04 + OpenCV4.0.* + ROS noetic + gtsam4.0.* + Ceres1.14.*
+参考： https://blog.csdn.net/qq_37868055/article/details/129288903
+---
 
 
-### 更新
+### 编译
 
 - **"new"分支**可用了，我们**建议您使用"new"分支**。因为原始 LVI-SAM 代码中的 LIO 系统使用了旧版本的 [LIO-SAM](https://github.com/TixiaoShan/LIO-SAM)，其中存在一些 bug，这些 bug 已在最新的 LIO-SAM 代码中修复。目前，我们已经将最新版本的 LIO-SAM 更新到 LVI-SAM 中，因此系统更加鲁棒。您可以使用以下命令下载并编译 **"new"分支**。
+- **"new"分支**已合并到默认分支
 
   ```shell
-  mkdir -p ~/catkin_ws/src 
-  cd ~/catkin_ws/src
-  git clone https://github.com/Cc19245/LVI-SAM-Easyused
-  git checkout new
+  mkdir -p ~/lvi-sam/src 
+  cd ~/lvi-sam/src
+  git clone https://github.com/NeSC-IV/LVI-SAM-Easyused.git
   cd ..
   catkin_make
   ```
-
-
 ---
 
-
-
-## 依赖库
-
-这个仓库的依赖库与官方 [LVI-SAM](https://github.com/TixiaoShan/LVI-SAM) 相同。所以如果编译出现问题，建议先编译官方的 [LVI-SAM](https://github.com/TixiaoShan/LVI-SAM)。目前我们只在 Ubuntu 18.04 + ROS-melodic 环境中进行了测试。
-
----
-
-
-
-## 编译
-
-你可以使用如下命令下载并编译这个功能包。
-
+### 运行
 ```shell
-mkdir -p ~/catkin_ws/src
-cd ~/catkin_ws/src
-git clone https://github.com/Cc19245/LVI-SAM-Easyused
-cd ..
-catkin_make
+source devel/setup.bash
+roslaunch lvi_sam Husky.launch
 ```
-
-**注意**：如果想使用未修改的代码（LVI-SAM官方代码），可以修改 `CMakeLists.txt` 中的定义，重新编译。
-
-```cmake
-################## 编译开关 compile switch##############
-# -DIF_OFFICIAL=1: use origin official LVI-SAM code
-# -DIF_OFFICIAL=0: use modified code of this repo
-add_definitions(-DIF_OFFICIAL=0)
-```
+- 运行后，在 ```~/lvi-sam/results/```下会自动保存地图文件和轨迹文件。
 
 ---
 
+### 评估
+```shell
+# pcd转txt，位于~/lvi-sam/src/LVI-SAM-Easyused/pcd2tum.py
+# pip install pyntcloud
+python pcd2tum.py
+```
+- 安装evo评估工具
+```shell
+# https://github.com/MichaelGrupp/evo
+pip install evo --upgrade --no-binary evo
+```
+- 拷贝真值轨迹
+```shell
+cp ~/lvi-sam/src/LVI-SAM-Easyused/results/gt.txt ~/lvi-sam/results/gt.txt
+```
+- 计算误差
+```shell
+# -r full (旋转+平移) trans_part (平移m) angle_deg (旋转deg)
+evo_ape tum gt.txt lvisam.txt -r full -va --plot --plot_mode xy --save_plot ./lvisamplot
+# 多轨迹绘制
+# evo_traj tum lvisam.txt fastlio2.txt kissicp.txt --ref=gt.txt -va -p --plot_mode=xy --save_plot ./trajall
+```
 
+---
 
 ## 参数配置
+
+- 相机内参，相机-IMU，LiDAR-IMU外参已配置到Husky_camera.yaml，Husky_lidar.yaml中
 
 ### 传感器外参配置
 
@@ -276,7 +282,7 @@ extrinsicTranslation: !!opencv-matrix
 
 - 我们在“**new**”分支上测试了[KAIST Complex Urban Dataset](https://sites.google.com/view/complex-urban-dataset)。 我们主要做了两个改动：
 
-  - 我们将最新版本的 LIO-SAM 代码更新为 LVI-SAM，因此系统更加健壮，可以在 KAIST Complex Urban Dataset 上成功运行。
+  - 我们将最新版本的 LIO-SAM repo 代码更新为 LVI-SAM，因此系统更加健壮，可以在 KAIST Complex Urban Dataset 上成功运行。
   - 我们从原始的 KAIST Complex Urban Dataset 生成 rosbag，并恢复 LiDAR 点云的 “ring” 和 “time” 字段。 您可以使用[doc/kaise-help](./doc/kaist-help) 中的 ros 包来生成 rosbag。
 
 - 在  KAIST Complex Urban Dataset urban26 序列上测试：
@@ -308,7 +314,7 @@ extrinsicTranslation: !!opencv-matrix
 ## 注意
 
 - 此代码只是修改了 LVI-SAM 的外参配置以便于使用，它的目的是让你更快地在其他数据集和你自己的设备上运行 LVI-SAM，所以它 **没有** 修改 LVI-SAM 的算法部分。
-- 如果你想知道我做了哪些改动以及为什么这些改动有效，你可以参考我的博客：[LVI-SAM坐标系外参分析与代码修改，以适配各种数据集](https://blog.csdn.net/qq_42731705/article/details/128344179)。
+- 如果你想知道我做了哪些改动以及为什么这些改动有效，你可以参考我的博客：[LVI-SAM坐标系外参分析与代码修改，以适配各种数据集](https://blog .csdn.net/qq_42731705/article/details/128344179)。
 - 我对 LVI-SAM 代码做了中文注释，仓库参见 [LVI-SAM-CC_Comments](https://github.com/Cc19245/LVI-SAM-CC_Comments) 。
 ---
 

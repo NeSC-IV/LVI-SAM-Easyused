@@ -4,8 +4,6 @@
 #include <ros/package.h>
 #include <eigen3/Eigen/Dense>
 #include "utility/utility.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/core/eigen.hpp>
 
 #include <std_msgs/Header.h>
 #include <std_msgs/Bool.h>
@@ -51,7 +49,8 @@
 #include <array>
 #include <thread>
 #include <mutex>
-
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/eigen.hpp>
 const int WINDOW_SIZE = 10;
 
 
